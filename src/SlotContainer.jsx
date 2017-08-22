@@ -38,6 +38,7 @@ const Slot = wrap(
     state => { return state; },
     dispatch => { return {
       moveCardToSlot: (dragItem, dropContainerId, dropIndex) => dispatch({type: 'MOVE_CARD_TO_SLOT', dragItem, dropContainerId, dropIndex}),
+      moveCardToAnotherContainer: (dragItem, dropContainerId, dropIndex) => dispatch({type: 'MOVE_CARD_TO_ANOTHER_CONTAINER', dragItem, dropContainerId, dropIndex}),
     }; }
 
   ),

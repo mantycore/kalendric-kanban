@@ -11,7 +11,7 @@ let initialState = {
     text: 'The Wind That Shakes the Barley',
   }, {
     id: 2,
-    text: 'Zero Sum',
+    text: 'Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit amet consectetur adipisci~ velit, sed quia non numquam ~ eius modi tempora inci~dunt, ut labore et dolore magnam aliquam quaerat voluptatem.',
   }, {
     id: 3,
     text: 'Zombie',
