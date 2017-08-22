@@ -52,8 +52,9 @@ const Slot = wrap(
     class extends Component {
         render() {
             const cardId = this.props.containers[this.props.id][0];
-            const card = cardId === null || cardId === undefined ? null : this.props.cards[cardId];
-
+            const card = cardId === null || cardId === undefined
+                ? null
+                : this.props.cards.find((card) => card.id === cardId);
             return wrap(
                 this.props.connectDropTarget,
                 <div style={slotStyle}>
