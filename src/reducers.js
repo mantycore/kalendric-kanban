@@ -1,4 +1,5 @@
-import update from 'immutability-helper';
+import produce from 'immer';
+import actionType from './ActionTypes.js';
 
 let initialState = {
     cards: [
@@ -30,57 +31,49 @@ let initialState = {
     }
 };
 
-[...Array(12).keys()].forEach(key => {initialState.containers['Slot_3_' + key] = [null];});
+//initialize dozen empty slots in the slot container
+[...Array(12).keys()].forEach(key => {initialState.containers['Slot_3_' + key] = [];});
 
+//give the cards random pastel colors
 initialState.cards.forEach(card => {
     card.color = '#' + [0, 0, 0].map(() => 
         Math.floor(Math.random() * (230 - 200) + 200).toString(16)).join('');
 });
 
-const remove = (dragIndex) => [dragIndex, 1];
-const add = (dropIndex, dragId) => [dropIndex, 0, dragId];
-
 const reducer = (state = initialState, action) => {
     const dropIndex = action.dropIndex === '$last' 
         ? state.containers[action.dropContainerId].length
         : action.dropIndex;
+
+    const move = (fromContainer, toContainer, fromIndex, toIndex, item) => {
+        fromContainer.splice(fromIndex, 1);
+        toContainer.splice(toIndex, 0, item);
+    }
+
     switch (action.type) {
-        case 'MOVE_CARD':
-            return update(state, {
-                containers: {
-                    [action.dropContainerId]: {
-                        $splice: [
-                            remove(action.dragItem.index),
-                            add(dropIndex, action.dragItem.id)
-                        ],
-                    }
-                },
+        case actionType('MOVE_CARD'):
+            return produce(state, draftState => {
+                let container = draftState.containers[action.dropContainerId];
+                move(container, container,
+                        action.dragItem.index, dropIndex, action.dragItem.id);
             });
-        case 'MOVE_CARD_TO_ANOTHER_CONTAINER':
-            return update(state, {
-                containers: {
-                    [action.dragItem.containerId]: {
-                        $splice: [remove(action.dragItem.index)]
-                    },
-                    [action.dropContainerId]: {
-                        $splice: [add(dropIndex, action.dragItem.id)]
-                    }
-                },
-            });
-        case 'MOVE_CARD_TO_SLOT':
-            const slot = state.containers[action.dropContainerId]
-            if (slot.length === 0 || slot[0] === null) {
-                return update(state, {
-                    containers: {
-                        [action.dragItem.containerId]: {
-                            $splice: [remove(action.dragItem.index)]
-                        },
-                        [action.dropContainerId]: {
-                            $set: [action.dragItem.id]
-                        }
-                    }
+        case actionType('MOVE_CARD_TO_ANOTHER_CONTAINER'):
+            return produce(state, draftState => {
+                move(
+                    draftState.containers[action.dragItem.containerId],
+                    draftState.containers[action.dropContainerId],
+                    action.dragItem.index, dropIndex, action.dragItem.id
+                );
+            })
+        case actionType('MOVE_CARD_TO_SLOT'):
+            const slot = state.containers[action.dropContainerId];
+            if (slot.length === 0) {
+                return produce(state, draftState => {
+                    draftState.containers[action.dragItem.containerId].splice(action.dragItem.index, 1);
+                    draftState.containers[action.dropContainerId] = [action.dragItem.id];
                 });
             } else {
+                //the slot is already occupied
                 return state;
             }
         default: return state; 

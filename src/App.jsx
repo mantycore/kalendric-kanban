@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { DragDropContext } from 'react-dnd';
 import MultiBackend from 'react-dnd-multi-backend';
 import HTML5toTouch from 'react-dnd-multi-backend/lib/HTML5toTouch'; 
-import { wrap } from './fun'
+import { wrap } from './fun.js'
 import './App.css';
 
-import Container from './Container.jsx';
-import SlotContainer from './SlotContainer.jsx';
+import Container from './components/Container.jsx';
+import SlotContainer from './components/SlotContainer.jsx';
 
 class App extends Component {
     render() {

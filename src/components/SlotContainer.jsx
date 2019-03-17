@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { DropTarget } from 'react-dnd';
-import ItemTypes from './ItemTypes';
-import { wrap } from './fun';
+import actionType from '../ActionTypes.js';
+import itemType from '../ItemTypes.js';
+import { wrap } from '../fun.js';
 
 import Card from './Card.jsx';
 
@@ -36,20 +38,24 @@ const slotTarget = {
 
 const Slot = wrap(
     connect(
-        state => { return state; },
-        dispatch => { return {
-            moveCardToSlot: (dragItem, dropContainerId, dropIndex) =>
-                dispatch({type: 'MOVE_CARD_TO_SLOT', dragItem, dropContainerId, dropIndex}),
-            moveCardToAnotherContainer: (dragItem, dropContainerId, dropIndex) =>
-                dispatch({type: 'MOVE_CARD_TO_ANOTHER_CONTAINER', dragItem, dropContainerId, dropIndex}),
-        }; }
+        state => state,
+        dispatch => ({
+            moveCardToSlot: (dragItem, dropContainerId) =>
+                dispatch({type: actionType('MOVE_CARD_TO_SLOT'), dragItem, dropContainerId}),
+        })
     ),
 
-    DropTarget(ItemTypes.CARD, slotTarget, connect => ({
+    DropTarget(itemType('CARD'), slotTarget, connect => ({
         connectDropTarget: connect.dropTarget(),
     })),
 
     class extends Component {
+        static propTypes = {
+            connectDropTarget: PropTypes.func.isRequired,
+            id: PropTypes.any.isRequired,
+            moveCardToSlot: PropTypes.func.isRequired,
+        };
+
         render() {
             const cardId = this.props.containers[this.props.id][0];
             const card = cardId === null || cardId === undefined
@@ -62,12 +68,10 @@ const Slot = wrap(
                     <Card
                         key={card.id}
                         id={card.id}
-                        index="0"
+                        index={0}
                         color={card.color}
                         containerId={this.props.id}
                         text={card.text}
-                        moveCard={this.props.moveCard}
-                        moveCardToAnotherContainer={this.props.moveCardToAnotherContainer}
                     /> : ''
                 }
                 </div>

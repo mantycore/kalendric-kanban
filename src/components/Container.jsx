@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { DropTarget } from 'react-dnd';
-import ItemTypes from './ItemTypes';
-import { wrap } from './fun';
+import actionType from '../ActionTypes.js';
+import itemType from '../ItemTypes.js';
+import { wrap } from '../fun.js';
 
 import Card from './Card.jsx';
 
@@ -27,7 +29,7 @@ const containerTarget = {
         const dropContainerId = props.id;
 
         if (dragItem.containerId === dropContainerId) {
-            props.moveCard(dragItem, dropContainerId, '$last');      
+            props.moveCard(dragItem, dropContainerId, '$last');
         } else {
             props.moveCardToAnotherContainer(dragItem, dropContainerId, '$last');
         }
@@ -36,20 +38,27 @@ const containerTarget = {
 
 export default wrap(
     connect(
-        state => { return state; },
-        dispatch => { return {
+        state => state,
+        dispatch => ({
             moveCard: (dragItem, dropContainerId, dropIndex) =>
-                dispatch({type: 'MOVE_CARD', dragItem, dropContainerId, dropIndex}),
+                dispatch({type: actionType('MOVE_CARD'), dragItem, dropContainerId, dropIndex}),
             moveCardToAnotherContainer: (dragItem, dropContainerId, dropIndex) =>
-                dispatch({type: 'MOVE_CARD_TO_ANOTHER_CONTAINER', dragItem, dropContainerId, dropIndex}),
-        }; }
+                dispatch({type: actionType('MOVE_CARD_TO_ANOTHER_CONTAINER'), dragItem, dropContainerId, dropIndex}),
+        })
     ),
 
-    DropTarget(ItemTypes.CARD, containerTarget, connect => ({
+    DropTarget(itemType('CARD'), containerTarget, connect => ({
         connectDropTarget: connect.dropTarget(),
     })),
 
     class Container extends Component {
+        static propTypes = {
+            connectDropTarget: PropTypes.func.isRequired,
+            id: PropTypes.any.isRequired,
+            moveCard: PropTypes.func.isRequired,
+            moveCardToAnotherContainer: PropTypes.func.isRequired,
+        };
+
         render() {
             const { cards, containers } = this.props;
 
@@ -65,8 +74,6 @@ export default wrap(
                             color={card.color}
                             containerId={this.props.id}
                             text={card.text}
-                            moveCard={this.props.moveCard}
-                            moveCardToAnotherContainer={this.props.moveCardToAnotherContainer}
                         />
                     })}
                 </div>
